@@ -55,4 +55,7 @@ export const firebaseOptions = {
   measurementId: 'G-GRHXHP1YRM',
 };
 
+export const firebaseVapidKey =
+  'BN5e4Cko_45RLYm00sJRuOuYzwBv6AletuZIcwtTp3ELurhNkMBLIFEbFOuBrF04W14rPt8xaaY-MiLjDhCLbRI';
+
 // build: vercel trigger build - 21.05.21

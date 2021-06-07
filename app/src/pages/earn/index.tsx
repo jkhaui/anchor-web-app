@@ -4,6 +4,7 @@ import {
 } from '@terra-dev/styled-neumorphism';
 import { PaddedLayout } from 'components/layouts/PaddedLayout';
 import { screen } from 'env';
+import { LiquidationAlertUI } from 'jobs/liquidationAlert/ui';
 import React from 'react';
 import styled from 'styled-components';
 import { InterestSection } from './components/InterestSection';
@@ -18,6 +19,7 @@ function EarnBase({ className }: EarnProps) {
   return (
     <PaddedLayout className={className}>
       <section className="grid">
+        <LiquidationAlertUI />
         <TotalDepositSection className="total-deposit" />
         <InterestSection className="interest" />
         <TransactionHistorySection className="transaction-history" />

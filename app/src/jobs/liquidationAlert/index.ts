@@ -3,6 +3,7 @@ import { Rate } from '@anchor-protocol/types';
 import { useAnchorWebapp } from '@anchor-protocol/webapp-provider';
 import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { useTerraWebapp } from '@terra-money/webapp-provider';
+import big from 'big.js';
 import { useNotification } from 'contexts/notification';
 import { useCallback, useEffect, useRef } from 'react';
 import { userLtvQuery } from './userLtv';
@@ -26,10 +27,12 @@ export function useLiquidationAlert() {
         address,
       });
 
-      create('Ltv Alert!', {
-        body: `your Ltv is ${formatRate(ltv as Rate)}%`,
-        icon: '/logo.png',
-      });
+      if (big(ltv).gt(0.45)) {
+        create('Ltv Alert!', {
+          body: `your Ltv is ${formatRate(ltv as Rate)}%`,
+          icon: '/logo.png',
+        });
+      }
     } catch {}
   }, [
     address,
@@ -50,7 +53,7 @@ export function useLiquidationAlert() {
     if (connectedWallet && permission === 'granted') {
       const intervalId = setInterval(() => {
         jobCallbackRef.current();
-      }, 1000 * 30);
+      }, 1000 * 60 * 10);
 
       jobCallbackRef.current();
 

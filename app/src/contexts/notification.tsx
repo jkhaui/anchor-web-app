@@ -1,4 +1,4 @@
-import { firebaseOptions } from 'env';
+import { firebaseOptions, firebaseVapidKey } from 'env';
 import firebase from 'firebase';
 import React, {
   Consumer,
@@ -18,6 +18,7 @@ export interface NotificationProviderProps {
 
 export interface NotificationState {
   permission: NotificationPermission;
+  messagingToken: string | undefined;
   create: (
     title: string,
     options?: NotificationOptions,
@@ -45,6 +46,9 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   const [permission, setPermission] =
     useState<NotificationPermission>('default');
 
+  const [messagingToken, setMessagingToken] =
+    useState<string | undefined>(undefined);
+
   const create = useCallback(
     (title: string, options?: NotificationOptions) => {
       if (permission === 'granted') {
@@ -70,14 +74,42 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       console.log('notification.tsx..()', initialPermission);
       setPermission(initialPermission);
     });
+
+    const messaging = firebase.messaging();
+
+    messaging
+      .getToken({
+        vapidKey: firebaseVapidKey,
+      })
+      .then((token) => {
+        setMessagingToken(token);
+
+        messaging.onMessage({
+          next: (value: firebase.messaging.MessagePayload) => {
+            if (value.notification) {
+              new Notification(value.notification.title ?? 'Anchor', {
+                body: value.notification.body,
+              });
+            }
+            console.log('notification.tsx..next()', value);
+          },
+          error: (error) => {
+            console.error('notification.tsx..error()', error);
+          },
+          complete: () => {
+            console.log('notification.tsx..complete()');
+          },
+        });
+      });
   }, []);
 
   const state = useMemo<NotificationState>(
     () => ({
       permission,
       create,
+      messagingToken,
     }),
-    [create, permission],
+    [create, messagingToken, permission],
   );
 
   return (
